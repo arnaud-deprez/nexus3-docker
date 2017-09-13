@@ -1,9 +1,5 @@
-import org.sonatype.nexus.blobstore.api.BlobStoreManager
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
-import org.sonatype.nexus.repository.storage.WritePolicy
-import org.sonatype.nexus.repository.maven.VersionPolicy
-import org.sonatype.nexus.repository.maven.LayoutPolicy
 
 Repository createHostedRepository(String name) {
     if (!repository.getRepositoryManager().exists(name))

@@ -86,15 +86,10 @@ objects:
       app: ${SERVICE_NAME}
       deploymentconfig: ${SERVICE_NAME}
     strategy:
-      activeDeadlineSeconds: 21600
+      type: Recreate
       resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
-        timeoutSeconds: 600
-        updatePeriodSeconds: 1
-#        TODO: fix permission due to another pod context
+#        TODO: fix why post hook pod is not running
+#      recreateParams:
 #        post:
 #          failurePolicy: Abort
 #          execNewPod:
@@ -102,9 +97,8 @@ objects:
 #            - name: TARGET_SERVICE_NAME
 #              value: ${SERVICE_NAME}
 #            command:
-#            - ./docker-entrypoint.sh init
+#            - init
 #            container: nexus
-      type: Rolling
     template:
       metadata:
         labels:

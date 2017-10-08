@@ -4,7 +4,7 @@ node('gradle') {
     def volumeCapacity="10Gi"
 
     stage('Checkout') {
-        git url: "https://github.com/arnaud-deprez/nexus3-docker.git"
+        git url: "https://github.com/arnaud-deprez/nexus3-docker.git", branch: "master"
     }
     stage('Build Nexus init scripts') {
         sh "gradle -Pci=true clean transformScriptToJson"

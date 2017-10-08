@@ -32,12 +32,11 @@ function createOrUpdateThenRunScript() {
 }
 
 function init() {
-    echo "Start Nexus for initialization"
+    echo "Start Nexus initialization..."
     local baseUrl=$1
     local username=$2
     local password=$3
-    exec bin/nexus run &
-    pid="$!"
+
     #wait
     waitNexusStarted $baseUrl
 
@@ -48,11 +47,6 @@ function init() {
         esac
     done
 
-    if ! kill -s TERM "$pid" || ! wait "$pid"; then
-        echo >&2 'Nexus init process failed.'
-        exit 1
-    fi
-
     echo
     echo 'Nexus init process done. Ready for start up.'
     echo
@@ -60,7 +54,18 @@ function init() {
 
 function run() {
     if [ "$ORCHESTRATION_ENABLED" != true ]; then
+        echo "Start Nexus for initialization"
+        exec bin/nexus run &
+        pid="$!"
+
+        # run actual init
         init "$baseUrl" "$username" "$password"
+
+        #stop nexus
+        if ! kill -s TERM "$pid" || ! wait "$pid"; then
+            echo >&2 'Nexus init process failed.'
+            exit 1
+        fi
     fi
 
     echo "Start $(pwd)/bin/nexus $@"

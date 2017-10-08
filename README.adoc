@@ -1,5 +1,18 @@
 = Automate nexus configuration with scripting API
 
+Nexus 3 comes with a groovy script API that can be uploaded and executed on nexus through a REST API. More information
+link::https://help.sonatype.com/display/NXRM3/REST+and+Integration+API[here].
+
+To develop a groovy script, it's easier to use a dependency system such as gradle or maven to manage it so we can have auto
+completion in our favourite IDE.
+
+Then to upload this script, it must be encoded in the Nexus REST JSON API. Of course we could directly write the groovy script
+inside the JSON format which is completely fine and manageable for small script but when script gets bigger,
+it becomes harder to manage too.
+
+The goal of this project is to show an example of how nexus 3 configuration can be versioned and managed in a VCS repository such as git,
+so your complete CI/CD pipeline infrastructure can be managed as code.
+
 == Openshift
 
 This example has been tested with link:https://github.com/minishift/minishift[Minishift].
@@ -10,36 +23,19 @@ To start a new Openshift instance:
 ----
 minishift config set cpus 4
 minishift config set memory 4GB
-minishift start --openshift-version 3.6.0
+minishift start
 ----
 
 === Nexus 3 deployment
 
 [source,shell]
 ----
-oc new-app sonatype/nexus3
-# https://github.com/OpenShiftDemos/nexus/issues/6
-oc env dc/nexus3 INSTALL4J_ADD_VM_PARAMS="-Xms1024m -Xmx1024m -Djava.util.prefs.userRoot=/nexus-data/"
-oc expose svc/nexus3
-
-#probe
-oc set probe dc/nexus3 \
-	--liveness \
-	--failure-threshold 3 \
-	--initial-delay-seconds 30 \
-	-- echo ok
-oc set probe dc/nexus \
-	--readiness \
-	--failure-threshold 3 \
-	--initial-delay-seconds 30 \
-	--get-url=http://:8081/nexus/content/groups/public
-
-#volume
-oc volumes dc/nexus3 --add \
-	--name 'nexus3-volume-1' \
-	--type 'pvc' \
-	--mount-path '/nexus-data/' \
-	--claim-name 'nexus3-pv' \
-	--claim-size '10G' \
-	--overwrite
+# declare variables
+version=latest
+# import official nexus3 image
+oc import-image nexus3:${version} --from=docker.io/sonatype/nexus3:${version} --confirm
+# create the pipeline to build and deploy nexus
+oc create -f openshift/pipeline.yml
+# start the pipeline
+oc start-build nexus3-pipeline
 ----

@@ -3,10 +3,8 @@ node('gradle') {
     def version="latest"
     def volumeCapacity="10Gi"
 
-    stage('Checkout') {
-        git url: "https://github.com/arnaud-deprez/nexus3-docker.git", branch: "master"
-    }
-    stage('Build Nexus init scripts') {
+    stage('Process resources') {
+        git url: "https://github.com/arnaud-deprez/nexus3-docker.git", branch: "maven-publish"
         sh "gradle -Pci=true clean transformScriptToJson"
     }
     stage('Build Image') {

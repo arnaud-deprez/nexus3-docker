@@ -7,7 +7,7 @@ set -u
 function waitNexusStarted() {
     local baseUrl=$1
     until [ $(curl -s -o /dev/null -w "%{http_code}" "$baseUrl") -eq "200" ]; do
-        echo "Waiting for service started..."
+        echo "$0: Waiting for service started..."
         sleep 10
     done
 }
@@ -21,24 +21,27 @@ function createOrUpdateThenRunScript() {
     local name=${fileName%.*}
 
     if [ $(curl -s -u "$username:$password" -o /dev/null -w "%{http_code}" "$baseUrl/service/siesta/rest/v1/script/$name") -eq 200 ]; then
-        echo "update and run script: $name"
+        echo "$0: update and run script: $name"
         curl -s -X PUT -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/siesta/rest/v1/script/$name" -d @"$file"
         curl -s -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/siesta/rest/v1/script/$name/run"
+        echo
     else
-        echo "create and run script: $name"
+        echo "$0: create and run script: $name"
         curl -s -X POST -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/siesta/rest/v1/script" -d @"$file"
         curl -s -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/siesta/rest/v1/script/$name/run"
+        echo
     fi
 }
 
 function init() {
-    echo "Start Nexus initialization..."
     local baseUrl=$1
     local username=$2
     local password=$3
 
     #wait
     waitNexusStarted $baseUrl
+
+    echo "$0: Start Nexus initialization..."
 
     for f in /docker-entrypoint-init.d/*; do
         case "$f" in
@@ -47,14 +50,13 @@ function init() {
         esac
     done
 
-    echo
-    echo 'Nexus init process done. Ready for start up.'
+    echo "$0: Nexus init process done. Ready for start up."
     echo
 }
 
 function run() {
     if [ "$ORCHESTRATION_ENABLED" != true ]; then
-        echo "Start Nexus for initialization"
+        echo "$0: Start Nexus for initialization: $(pwd)/bin/nexus run"
         exec bin/nexus run &
         pid="$!"
 
@@ -63,12 +65,12 @@ function run() {
 
         #stop nexus
         if ! kill -s TERM "$pid" || ! wait "$pid"; then
-            echo >&2 'Nexus init process failed.'
+            echo >&2 "$0: Nexus init process failed."
             exit 1
         fi
     fi
 
-    echo "Start $(pwd)/bin/nexus $@"
+    echo "$0: Start $(pwd)/bin/nexus $@"
     exec bin/nexus "$@"
 }
 

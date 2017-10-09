@@ -12,7 +12,7 @@ items:
     source:
       git:
         uri: https://github.com/arnaud-deprez/nexus3-docker.git
-        ref: master
+        ref: maven-publish
       type: Git
     strategy:
       type: JenkinsPipeline

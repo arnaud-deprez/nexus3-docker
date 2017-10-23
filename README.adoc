@@ -1,7 +1,7 @@
 = Automate nexus configuration with scripting API
 
 Nexus 3 comes with a groovy script API that can be uploaded and executed on nexus through a REST API. More information
-link::https://help.sonatype.com/display/NXRM3/REST+and+Integration+API[here].
+link:https://help.sonatype.com/display/NXRM3/REST+and+Integration+API[here].
 
 To develop a groovy script, it's easier to use a dependency system such as gradle or maven to manage it so we can have auto
 completion in our favourite IDE.

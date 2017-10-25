@@ -28,8 +28,12 @@ minishift start
 
 === Nexus 3 deployment
 
+This assume you are working in cicd project. If not, please change the project name in the pipeline and adapt the following accordingly:
+
 [source,shell]
 ----
+# if it does not exist yet
+oc new-project cicd
 # declare variables
 version=latest
 # import official nexus3 image

@@ -2,9 +2,10 @@ node('gradle') {
     def serviceName="nexus3"
     def version="latest"
     def volumeCapacity="10Gi"
+    def project="cicd"
 
     stage('Process resources') {
-        git url: "https://github.com/arnaud-deprez/nexus3-docker.git", branch: "maven-publish"
+        git url: "https://github.com/arnaud-deprez/nexus3-docker.git", branch: "master"
         sh "gradle -Pci=true clean transformScriptToJson"
     }
     stage('Build Image') {
@@ -12,12 +13,12 @@ node('gradle') {
         sh "rm -rf oc-build && mkdir -p oc-build"
         sh "cp -R Dockerfile build docker oc-build/"
         //create and start build
-        sh "oc process -f openshift/nexus3-persistent-template.yml -p SERVICE_NAME=${serviceName} -p NEXUS_VERSION=${version} -p VOLUME_CAPACITY=${volumeCapacity} | oc apply -f -"
-        sh "oc start-build ${serviceName}-docker --from-dir=oc-build"
+        sh "oc process -f openshift/nexus3-persistent-template.yml -p SERVICE_NAME=${serviceName} -p NEXUS_VERSION=${version} -p VOLUME_CAPACITY=${volumeCapacity} | oc apply -n $project -f -"
+        sh "oc start-build ${serviceName}-docker --from-dir=oc-build -n $project"
         openshiftVerifyBuild bldCfg: "${serviceName}-docker", waitTime: "20", waitUnit: "min"
     }
     stage('Deploy') {
-        sh "oc rollout latest dc/${serviceName}"
+        sh "oc rollout latest dc/${serviceName} -n $project"
         openshiftVerifyDeployment depCfg: serviceName
     }
 }

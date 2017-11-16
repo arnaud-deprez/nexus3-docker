@@ -55,9 +55,10 @@ function init() {
 }
 
 function run() {
+    nexus_script="$SONATYPE_DIR/nexus/bin/nexus"
     if [ "$ORCHESTRATION_ENABLED" != true ]; then
-        echo "$0: Start Nexus for initialization: $(pwd)/bin/nexus run"
-        exec bin/nexus run &
+        echo "$0: Start Nexus for initialization: $nexus_script run"
+        exec $nexus_script run &
         pid="$!"
 
         # run actual init
@@ -70,8 +71,8 @@ function run() {
         fi
     fi
 
-    echo "$0: Start $(pwd)/bin/nexus $@"
-    exec bin/nexus "$@"
+    echo "$0: Start $nexus_script $@"
+    exec $nexus_script "$@"
 }
 
 function usage() {

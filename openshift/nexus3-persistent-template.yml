@@ -88,17 +88,17 @@ objects:
     strategy:
       type: Recreate
       resources: {}
-#        TODO: fix why post hook pod is not running
-#      recreateParams:
-#        post:
-#          failurePolicy: Abort
-#          execNewPod:
-#            env:
-#            - name: TARGET_SERVICE_NAME
-#              value: ${SERVICE_NAME}
-#            command:
-#            - init
-#            container: nexus
+      recreateParams:
+        post:
+          failurePolicy: Abort
+          execNewPod:
+            env:
+            - name: TARGET_SERVICE_NAME
+              value: ${SERVICE_NAME}
+            command:
+            - /docker-entrypoint.sh
+            - init
+            container: nexus
     template:
       metadata:
         labels:
@@ -110,8 +110,8 @@ objects:
             # https://github.com/OpenShiftDemos/nexus/issues/6
           - name: INSTALL4J_ADD_VM_PARAMS
             value: "-Xms1024m -Xmx1024m -Djava.util.prefs.userRoot=/nexus-data/"
-#          - name: ORCHESTRATION_ENABLED
-#            value: "true"
+          - name: ORCHESTRATION_ENABLED
+            value: "true"
           image: ""
           imagePullPolicy: Always
           readinessProbe:

@@ -16,6 +16,8 @@ objects:
       app: ${SERVICE_NAME}
     name: ${SERVICE_NAME}-docker
   spec:
+    failedBuildsHistoryLimit: 5
+    successfulBuildsHistoryLimit: 5
     output:
       to:
         kind: ImageStreamTag

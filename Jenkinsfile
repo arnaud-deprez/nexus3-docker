@@ -1,4 +1,10 @@
 pipeline {
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+        disableConcurrentBuilds()
+        timestamps()
+    }
+
     agent { label 'gradle' }
 
     parameters {

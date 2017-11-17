@@ -26,15 +26,33 @@ pipeline {
                 sh "rm -rf oc-build && mkdir -p oc-build"
                 sh "cp -R Dockerfile build docker oc-build/"
                 //create and start build
-                sh "oc process -f openshift/nexus3-persistent-template.yml -p SERVICE_NAME=${params.SERVICE_NAME} -p NEXUS_VERSION=${params.VERSION} -p VOLUME_CAPACITY=${params.VOLUME_CAPACITY} | oc apply -n cicd -f -"
-                sh "oc start-build ${params.SERVICE_NAME}-docker --from-dir=oc-build -n cicd"
-                openshiftVerifyBuild bldCfg: "${params.SERVICE_NAME}-docker", waitTime: "20", waitUnit: "min"
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject('cicd') {
+                            def template = readYaml file: 'openshift/nexus3-persistent-template.yml'
+                            def resources = openshift.process(template, "-p", "SERVICE_NAME=${params.SERVICE_NAME}", "-p", "NEXUS_VERSION=${params.VERSION}", "-p", "VOLUME_CAPACITY=${params.VOLUME_CAPACITY}")
+                            def buildCfg = openshift.apply(resources).narrow('bc')
+                            def buildSelector = buildCfg.startBuild('--from-dir=oc-build')
+                            timeout(5) {
+                                buildSelector.untilEach(1) {
+                                    return it.object().status.phase == "Complete"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         stage('Deploy') {
             steps {
-                sh "oc rollout latest dc/${params.SERVICE_NAME} -n cicd"
-                openshiftVerifyDeployment depCfg: params.SERVICE_NAME
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject('cicd') {
+                            openshift.selector('dc', params.SERVICE_NAME).rollout().latest();
+                            openshiftVerifyDeployment depCfg: params.SERVICE_NAME
+                        }
+                    }
+                }
             }
         }
     }

@@ -16,7 +16,7 @@ pipeline {
     stages {
         stage('Process resources') {
             steps {
-                git url: "https://github.com/arnaud-deprez/nexus3-docker.git", branch: "master"
+                checkout scm
                 sh "gradle -Pci=true clean transformScriptToJson"
             }
         }
@@ -48,8 +48,9 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject('cicd') {
-                            openshift.selector('dc', params.SERVICE_NAME).rollout().latest();
-                            openshiftVerifyDeployment depCfg: params.SERVICE_NAME
+                            openshift.selector('dc', params.SERVICE_NAME).rollout().latest()
+                            // TODO: replace it when https://github.com/openshift/jenkins-client-plugin/issues/84 will be solved
+                            openshiftVerifyDeployment depCfg: params.SERVICE_NAME, namespace: 'cicd'
                         }
                     }
                 }

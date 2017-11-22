@@ -39,7 +39,7 @@ version=latest
 # import official nexus3 image
 oc import-image nexus3:${version} --from=docker.io/sonatype/nexus3:${version} --confirm
 # create the pipeline to build and deploy nexus
-oc create -f openshift/pipeline.yml
+oc create -f https://raw.githubusercontent.com/arnaud-deprez/nexus3-docker/master/openshift/pipeline.yml
 # start the pipeline
 oc start-build nexus3-pipeline
 ----

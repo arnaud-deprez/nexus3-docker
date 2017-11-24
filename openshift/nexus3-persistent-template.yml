@@ -23,7 +23,13 @@ objects:
         kind: ImageStreamTag
         name: "${SERVICE_NAME}-custom:${NEXUS_VERSION}"
     postCommit: {}
-    resources: {}
+    resources: 
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 1000m
+        memory: 512Mi
     runPolicy: Serial
     source:
       type: Docker
@@ -140,7 +146,13 @@ objects:
           ports:
           - containerPort: 8081
             protocol: TCP
-          resources: {}
+          resources: 
+            requests:
+              cpu: 100m
+              memory: 1Gi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
           volumeMounts:
           - mountPath: /nexus-data
             name: ${SERVICE_NAME}-data

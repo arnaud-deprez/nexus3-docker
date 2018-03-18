@@ -20,15 +20,15 @@ function createOrUpdateThenRunScript() {
     local fileName=$(basename "$file")
     local name=${fileName%.*}
 
-    if [ $(curl -s -u "$username:$password" -o /dev/null -w "%{http_code}" "$baseUrl/service/siesta/rest/v1/script/$name") -eq 200 ]; then
+    if [ $(curl -s -u "$username:$password" -o /dev/null -w "%{http_code}" "$baseUrl/service/rest/v1/script/$name") -eq 200 ]; then
         echo "$0: update and run script: $name"
-        curl -s -X PUT -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/siesta/rest/v1/script/$name" -d @"$file"
-        curl -s -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/siesta/rest/v1/script/$name/run"
+        curl -s -X PUT -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/rest/v1/script/$name" -d @"$file"
+        curl -s -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/rest/v1/script/$name/run"
         echo
     else
         echo "$0: create and run script: $name"
-        curl -s -X POST -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/siesta/rest/v1/script" -d @"$file"
-        curl -s -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/siesta/rest/v1/script/$name/run"
+        curl -s -X POST -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/rest/v1/script" -d @"$file"
+        curl -s -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/rest/v1/script/$name/run"
         echo
     fi
 }

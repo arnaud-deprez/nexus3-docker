@@ -1,7 +1,7 @@
-= Automate nexus configuration with scripting API
+# Automate nexus configuration with scripting API
 
 Nexus 3 comes with a groovy script API that can be uploaded and executed on nexus through a REST API. More information
-link:https://help.sonatype.com/display/NXRM3/REST+and+Integration+API[here].
+[here](https://help.sonatype.com/display/NXRM3/REST+and+Integration+API).
 
 To develop a groovy script, it's easier to use a dependency system such as gradle or maven to manage it so we can have auto
 completion in our favourite IDE.
@@ -13,25 +13,23 @@ it becomes harder to manage too.
 The goal of this project is to show an example of how nexus 3 configuration can be versioned and managed in a VCS repository such as git,
 so your complete CI/CD pipeline infrastructure can be managed as code.
 
-== Openshift
+## Openshift
 
-This example has been tested with link:https://github.com/minishift/minishift[Minishift].
+This example has been tested with [Minishift](https://github.com/minishift/minishift).
 
 To start a new Openshift instance:
 
-[source,shell]
-----
+```sh
 minishift config set cpus 4
 minishift config set memory 4GB
 minishift start
-----
+```
 
-=== Nexus 3 deployment
+### Nexus 3 deployment
 
 This assume you are working in cicd project. If not, please change the project name in the pipeline and adapt the following accordingly:
 
-[source,shell]
-----
+```sh
 # if it does not exist yet
 oc new-project cicd
 # declare variables
@@ -42,4 +40,4 @@ oc import-image nexus3:${version} --from=docker.io/sonatype/nexus3:${version} --
 oc create -f https://raw.githubusercontent.com/arnaud-deprez/nexus3-docker/master/openshift/pipeline.yml
 # start the pipeline
 oc start-build nexus3-pipeline
-----
+```

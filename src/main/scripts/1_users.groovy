@@ -71,7 +71,7 @@ def lJenkins = createOrUpdateUser('jenkins', 'Leeroy', 'Jenkins', 'leeroy.jenkin
 log.info('User jenkins created')
 
 
-log.info('Script security completed successfully')
+log.info('Script 1_users completed successfully')
 
 //Return a JSON response containing our new Users for confirmation
 return JsonOutput.toJson([lJenkins])

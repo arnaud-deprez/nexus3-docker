@@ -1,19 +1,16 @@
 import org.sonatype.nexus.blobstore.api.BlobStoreManager
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
-import org.sonatype.nexus.repository.maven.LayoutPolicy
-import org.sonatype.nexus.repository.maven.VersionPolicy
 import org.sonatype.nexus.repository.storage.WritePolicy
+import org.sonatype.nexus.security.realm.RealmManager
 
 Repository createHostedRepository(final String name,
                                   final String blobStoreName = BlobStoreManager.DEFAULT_BLOBSTORE_NAME,
                                   final boolean strictContentTypeValidation = true,
-                                  final VersionPolicy versionPolicy = VersionPolicy.RELEASE,
-                                  final WritePolicy writePolicy = WritePolicy.ALLOW_ONCE,
-                                  final LayoutPolicy layoutPolicy = LayoutPolicy.STRICT) {
+                                  final WritePolicy writePolicy = WritePolicy.ALLOW) {
     if (!repository.getRepositoryManager().exists(name)) {
         log.info("Create hosted repository $name")
-        Repository repo = repository.createMavenHosted(name, blobStoreName, strictContentTypeValidation, versionPolicy, writePolicy, layoutPolicy)
+        Repository repo = repository.createNpmHosted(name, blobStoreName, strictContentTypeValidation, writePolicy)
         log.info("Repository created: ${repo.getConfiguration()}")
         return repo
     }
@@ -25,12 +22,10 @@ def createHostedRepository(Map m) { createHostedRepository m*.value }
 Repository createProxyRepository(final String name,
                                  final String url,
                                  final String blobStoreName = BlobStoreManager.DEFAULT_BLOBSTORE_NAME,
-                                 final boolean strictContentTypeValidation = true,
-                                 final VersionPolicy versionPolicy = VersionPolicy.RELEASE,
-                                 final LayoutPolicy layoutPolicy = LayoutPolicy.STRICT) {
+                                 final boolean strictContentTypeValidation = true) {
     if (!repository.getRepositoryManager().exists(name)) {
         log.info("Create proxy repository $name")
-        Repository repo = repository.createMavenProxy(name, url, blobStoreName, strictContentTypeValidation, versionPolicy, layoutPolicy)
+        Repository repo = repository.createNpmProxy(name, url, blobStoreName, strictContentTypeValidation)
         log.info("Repository created: ${repo.getConfiguration()}")
         return repo
     }
@@ -42,7 +37,7 @@ Repository createGroupRepository(final String name,
                                  final String blobStoreName = BlobStoreManager.DEFAULT_BLOBSTORE_NAME) {
     if (!repository.getRepositoryManager().exists(name)) {
         log.info("Create group repository $name")
-        Repository repo = repository.createMavenGroup(name, members, blobStoreName)
+        Repository repo = repository.createNpmGroup(name, members, blobStoreName)
         log.info("Repository created: ${repo.getConfiguration()}")
         return repo
     }
@@ -59,23 +54,12 @@ Repository createGroupRepository(final String name,
     }
 }
 
-/**
- * by default in the base image contains:
- *   - groups:
- *     - maven-public
- *   - hosted:
- *     - maven-releases
- *     - maven-snapshots
- *   - proxy:
- *     - maven-central
- */
-createHostedRepository('maven-releases')
-createHostedRepository('maven-snapshots', BlobStoreManager.DEFAULT_BLOBSTORE_NAME, true, VersionPolicy.SNAPSHOT, WritePolicy.ALLOW)
-createProxyRepository('maven-central', 'https://repo1.maven.org/maven2/')
+createHostedRepository('npm-releases')
+createProxyRepository('npm-registry', 'http://registry.npmjs.org/')
+createGroupRepository('npm-public', ['npm-releases', 'npm-registry'])
 
-createProxyRepository('jcenter', 'https://jcenter.bintray.com/')
-createProxyRepository('jboss-ga', 'https://maven.repository.redhat.com/ga/')
-createProxyRepository('gradle-plugins', 'https://plugins.gradle.org/m2/')
-createProxyRepository('spring-plugins-release', 'http://repo.spring.io/plugins-release/')
+log.info('Enable NpmToken realm')
+def realManager = container.lookup(RealmManager)
+realManager.enableRealm('NpmToken')
 
-createGroupRepository('maven-public', ['maven-releases', 'maven-snapshots', 'maven-central', 'jcenter', 'jboss-ga', 'gradle-plugins', 'spring-plugins-release'])
+log.info('Script 3_users processed successfully')

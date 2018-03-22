@@ -1,13 +1,14 @@
 import org.sonatype.nexus.blobstore.api.BlobStoreManager
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
+import org.sonatype.nexus.repository.maven.VersionPolicy
 import org.sonatype.nexus.repository.storage.WritePolicy
 import org.sonatype.nexus.security.realm.RealmManager
 
 Repository createHostedRepository(final String name,
                                   final String blobStoreName = BlobStoreManager.DEFAULT_BLOBSTORE_NAME,
                                   final boolean strictContentTypeValidation = true,
-                                  final WritePolicy writePolicy = WritePolicy.ALLOW) {
+                                  final WritePolicy writePolicy = WritePolicy.ALLOW_ONCE) {
     if (!repository.getRepositoryManager().exists(name)) {
         log.info("Create hosted repository $name")
         Repository repo = repository.createNpmHosted(name, blobStoreName, strictContentTypeValidation, writePolicy)
@@ -55,8 +56,9 @@ Repository createGroupRepository(final String name,
 }
 
 createHostedRepository('npm-releases')
+createHostedRepository('npm-snapshots', BlobStoreManager.DEFAULT_BLOBSTORE_NAME, true, WritePolicy.ALLOW)
 createProxyRepository('npm-registry', 'http://registry.npmjs.org/')
-createGroupRepository('npm-public', ['npm-releases', 'npm-registry'])
+createGroupRepository('npm-public', ['npm-releases', 'npm-snapshots', 'npm-registry'])
 
 log.info('Enable NpmToken realm')
 def realManager = container.lookup(RealmManager)

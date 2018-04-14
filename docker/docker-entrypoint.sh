@@ -1,8 +1,5 @@
 #!/bin/bash
-# fail if anything errors
 set -e
-# fail if a function call is missing an argument
-set -u
 
 function waitNexusStarted() {
     local baseUrl=$1
@@ -22,13 +19,13 @@ function createOrUpdateThenRunScript() {
 
     if [ $(curl -s -u "$username:$password" -o /dev/null -w "%{http_code}" "$baseUrl/service/rest/v1/script/$name") -eq 200 ]; then
         echo "$0: update and run script: $name"
-        curl -s -X PUT -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/rest/v1/script/$name" -d @"$file"
-        curl -s -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/rest/v1/script/$name/run"
+        curl -sf -X PUT -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/rest/v1/script/$name" -d @"$file"
+        curl -sf -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/rest/v1/script/$name/run"
         echo
     else
         echo "$0: create and run script: $name"
-        curl -s -X POST -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/rest/v1/script" -d @"$file"
-        curl -s -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/rest/v1/script/$name/run"
+        curl -sf -X POST -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/rest/v1/scripts" -d @"$file"
+        curl -sf -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/rest/v1/scripts/$name/run"
         echo
     fi
 }

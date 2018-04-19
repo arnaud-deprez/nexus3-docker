@@ -24,8 +24,8 @@ function createOrUpdateThenRunScript() {
         echo
     else
         echo "$0: create and run script: $name"
-        curl -sf -X POST -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/rest/v1/scripts" -d @"$file"
-        curl -sf -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/rest/v1/scripts/$name/run"
+        curl -sf -X POST -u "$username:$password" --header "Content-Type: application/json" "$baseUrl/service/rest/v1/script" -d @"$file"
+        curl -sf -X POST -u "$username:$password" --header "Content-Type: text/plain" "$baseUrl/service/rest/v1/script/$name/run"
         echo
     fi
 }

@@ -1,0 +1,29 @@
+{{- if and .Values.ingress.enabled (not (eq "openshift" .Values.deployment.type)) -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "nexus3.fullname" . }}
+  labels:
+{{ include "nexus3.labels" . | indent 4 }}
+  annotations:
+{{- if .Values.ingress.annotations }}
+{{ toYaml .Values.ingress.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+    - host: {{ .Values.ingress.hostname }}
+      http:
+        paths:
+          - backend:
+              serviceName: {{ template "nexus3.fullname" . }}
+              servicePort: "nexus-port"
+            path: {{ .Values.ingress.path }}
+{{- if .Values.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.hostname }}
+      {{- if .Values.ingress.tls.secretName }}
+      secretName: {{ .Values.ingress.tls.secretName | quote }}
+      {{- end }}
+{{- end -}}
+{{- end }}

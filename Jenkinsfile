@@ -20,7 +20,7 @@ pipeline {
                 sh "gradle -Pci=true clean transformScriptToJson"
             }
         }
-        stage('Build Image') {
+        stage('Build and Deploy') {
             steps {
                 // create a build dir context
                 sh "rm -rf oc-build && mkdir -p oc-build"
@@ -29,10 +29,10 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject('cicd') {
-                            def template = readYaml file: 'openshift/nexus3-persistent-template.yml'
-                            def resources = openshift.process(template, "-p", "SERVICE_NAME=${params.SERVICE_NAME}", "-p", "NEXUS_VERSION=${params.VERSION}", "-p", "VOLUME_CAPACITY=${params.VOLUME_CAPACITY}")
-                            def buildCfg = openshift.apply(resources).narrow('bc')
-                            def buildSelector = buildCfg.startBuild('--from-dir=oc-build')
+                            // create resources
+                            sh "helm upgrade --install ${params.SERVICE_NAME} charts/nexus3"
+                            //start build
+                            def buildSelector = openshift.selector('bc', "${params.SERVICE_NAME}-docker").startBuild('--from-dir=oc-build')
                             timeout(5) {
                                 buildSelector.untilEach(1) {
                                     return it.object().status.phase == "Complete"
@@ -43,18 +43,25 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
+        //TODO: add a way to control deployment
+        /*stage('Deploy') {
             steps {
                 script {
                     openshift.withCluster() {
                         openshift.withProject('cicd') {
-                            openshift.selector('dc', params.SERVICE_NAME).rollout().latest()
+                            openshift.selector('deploy', params.SERVICE_NAME).rollout().latest()
                             // TODO: replace it when https://github.com/openshift/jenkins-client-plugin/issues/84 will be solved
-                            openshiftVerifyDeployment depCfg: params.SERVICE_NAME, namespace: 'cicd'
+                            openshift.selector('deploy', params.SERVICE_NAME).withEach { deploy ->
+                                timeout(time: 10, unit: 'MINUTES') {
+                                    deploy.untilEach(1) {
+                                        it.rollout().status().out.contains('successfully rolled out')
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
+        }*/
     }
 }

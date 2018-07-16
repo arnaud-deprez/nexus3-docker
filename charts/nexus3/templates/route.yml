@@ -1,0 +1,18 @@
+{{- if and .Values.ingress.enabled (eq "openshift" .Values.deployment.type) -}}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    template.openshift.io/expose-uri: http://{.spec.host}{.spec.path}
+{{- if .Values.ingress.annotations }}
+{{ toYaml .Values.ingress.annotations | indent 4 }}
+{{- end }}
+  labels:
+{{ include "nexus3.labels" . | indent 4 }}
+  name: {{ template "nexus3.fullname" . }}
+spec:
+  host: {{ .Values.ingress.hostname }}
+  to:
+    kind: Service
+    name: {{ template "nexus3.fullname" . }}
+{{- end }}

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "nexus3.fullname" . }}
+  labels:
+{{ include "nexus3.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "nexus3.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "nexus3.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      {{- if .Values.nexus.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nexus.nodeSelector | indent 8 }}
+      {{- end }}
+      containers:
+        - name: nexus
+          image: {{ .Values.nexus.image }}:{{ .Values.nexus.imageTag }}
+          imagePullPolicy: {{ .Values.nexus.imagePullPolicy }}
+{{- if .Values.nexus.env }}
+          env:
+{{ toYaml .Values.nexus.env | indent 12 }}
+{{- end }}
+{{- if .Values.nexus.resources }}
+          resources:
+{{ toYaml .Values.nexus.resources | indent 12 }}
+{{- end }}
+          ports:
+            - containerPort: {{ .Values.service.internalPort }}
+              name: nexus-http
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.nexus.livenessProbe.path }}
+              port: {{ .Values.service.internalPort }}
+            initialDelaySeconds: {{ .Values.nexus.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.nexus.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.nexus.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.nexus.readinessProbe.path }}
+              port: {{ .Values.service.internalPort }}
+            initialDelaySeconds: {{ .Values.nexus.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.nexus.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.nexus.readinessProbe.failureThreshold }}
+          volumeMounts:
+            - mountPath: /nexus-data
+              name: nexus-data
+      {{- if .Values.nexus.securityContext }}
+      securityContext:
+{{ toYaml .Values.nexus.securityContext | indent 8 }}
+      {{- end }}
+      volumes:
+        - name: nexus-data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-%s" (include "nexus3.fullname" .) "data") }}
+          {{- else }}
+          emptyDir: {}
+          {{- end -}}

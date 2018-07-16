@@ -13,7 +13,7 @@ it becomes harder to manage too.
 The goal of this project is to show an example of how nexus 3 configuration can be versioned and managed in a VCS repository such as git,
 so your complete CI/CD pipeline infrastructure can be managed as code.
 
-## Openshift
+## Openshift setup
 
 This example has been tested with [Minishift](https://github.com/minishift/minishift).
 
@@ -34,8 +34,6 @@ This assume you are working in cicd project. If not, please change the project n
 oc new-project cicd
 # declare variables
 version=latest
-# import official nexus3 image
-oc import-image nexus3:${version} --from=docker.io/sonatype/nexus3:${version} --confirm
 # create the pipeline to build and deploy nexus
 oc create -f https://raw.githubusercontent.com/arnaud-deprez/nexus3-docker/master/openshift/pipeline.yml
 # start the pipeline

@@ -1,0 +1,69 @@
+deployment:
+  type: "openshift"
+
+replicaCount: 1
+
+nexus:
+  image: "172.30.1.1:5000/cicd/nexus3"
+  imageTag: "latest"
+  imagePullPolicy: IfNotPresent
+  env:
+    - name: install4jAddVmParams
+      value: "-Xms1200M -Xmx1200M -XX:MaxDirectMemorySize=2G -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+  resources:
+    requests:
+      cpu: 250m
+      memory: 2Gi
+  # securityContext:
+  #   fsGroup: 2000
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 6
+    path: /
+  readinessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 6
+    path: /
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  ## If defined, storageClass: <storageClass>
+  ## If set to "-", storageClass: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClass spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # existingClaim:
+  # annotations:
+  #  "helm.sh/resource-policy": keep
+  # storageClass: "-"
+  storageSize: 8Gi
+
+service:
+  annotations:
+    fabric8.io/expose: "true"
+  name: nexus
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 8081
+
+ingress:
+  enabled: true
+  path: /
+  annotations: {}
+  # # NOTE: Can't use 'false' due to https://github.com/jetstack/kube-lego/issues/173.
+  # kubernetes.io/ingress.allow-http: true
+  # kubernetes.io/ingress.class: gce
+  # kubernetes.io/ingress.global-static-ip-name: ""
+  # kubernetes.io/tls-acme: true
+  tls:
+    enabled: false
+  #   secretName: nexus-tls
+
+build:
+  git:
+    uri: "https://github.com/arnaud-deprez/nexus3-docker.git"
+  contextDir: "."

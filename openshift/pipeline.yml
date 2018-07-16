@@ -18,7 +18,4 @@ items:
       type: JenkinsPipeline
       jenkinsPipelineStrategy:
         jenkinsfilePath: Jenkinsfile
-    triggers:
-    - generic:
-        secret: FiArdDBH
-      type: Generic
+    triggers: []

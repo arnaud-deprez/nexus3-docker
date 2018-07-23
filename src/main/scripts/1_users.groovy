@@ -1,26 +1,25 @@
-import com.google.common.collect.Sets
-import org.sonatype.nexus.security.role.Role
-import org.sonatype.nexus.security.role.RoleIdentifier
-import org.sonatype.nexus.security.user.User
-import org.sonatype.nexus.security.user.UserSearchCriteria
-import org.sonatype.nexus.security.user.UserStatus
 import groovy.json.JsonOutput
+import org.sonatype.nexus.security.role.NoSuchRoleException
+import org.sonatype.nexus.security.role.Role
+import org.sonatype.nexus.security.user.User
+import org.sonatype.nexus.security.user.UserStatus
 
-import static com.google.common.base.Preconditions.checkNotNull
 import static org.sonatype.nexus.security.user.UserManager.DEFAULT_SOURCE
 
 Role createOrUpdateRole(String id, String name, String description, List<String> privileges, List<String> roles) {
-    Role role = security.getSecuritySystem().getAuthorizationManager(DEFAULT_SOURCE).listRoles().find { it.roleId == id }
+    Role role = null
+    try {
+        role = security.getSecuritySystem().getAuthorizationManager(DEFAULT_SOURCE).getRole(id)
+    }
+    catch (NoSuchRoleException ex) {
+        log.info("No role found with id: $id. Will create this role", ex)
+    }
     if (role) {
-        role = security.getSecuritySystem().getAuthorizationManager(DEFAULT_SOURCE).updateRole(
-            new Role(
-                roleId: checkNotNull(id),
-                source: DEFAULT_SOURCE,
-                name: checkNotNull(name),
-                description: description,
-                privileges: Sets.newHashSet(checkNotNull(privileges)),
-                roles: Sets.newHashSet(checkNotNull(roles))
-            ))
+        role.setName(name)
+        role.setDescription(description)
+        role.setPrivileges(privileges.toSet())
+        role.setRoles(roles.toSet())
+        role = security.getSecuritySystem().getAuthorizationManager(DEFAULT_SOURCE).updateRole(role)
     } else {
         role = security.addRole(id, name, description, privileges, roles)
     }
@@ -28,19 +27,14 @@ Role createOrUpdateRole(String id, String name, String description, List<String>
 }
 
 User createOrUpdateUser(String id, String firstName, String lastName, String email, boolean active, String password, List<String> roles) {
-    User user = security.getSecuritySystem().searchUsers(new UserSearchCriteria(id)).find()
+    User user = security.getSecuritySystem().getUser(id)
     if (user) {
-        user = security.getSecuritySystem().updateUser(
-            new User(
-                userId: checkNotNull(id),
-                source: DEFAULT_SOURCE,
-                firstName: checkNotNull(firstName),
-                lastName: checkNotNull(lastName),
-                emailAddress: checkNotNull(email),
-                status: checkNotNull(active) ? UserStatus.active : UserStatus.disabled,
-                roles: checkNotNull(roles) ? roles.collect { new RoleIdentifier(DEFAULT_SOURCE, it) } : []
-            )
-        )
+        user.setFirstName(firstName)
+        user.setLastName(lastName)
+        user.setEmailAddress(email)
+        user.setStatus(active ? UserStatus.active : UserStatus.disabled)
+        security.getSecuritySystem().updateUser(user)
+        user = security.setUserRoles(id, roles)
     } else {
         user = security.addUser(id, firstName, lastName, email, active, password, roles)
     }

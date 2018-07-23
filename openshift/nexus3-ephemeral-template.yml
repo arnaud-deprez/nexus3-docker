@@ -117,7 +117,7 @@ objects:
         - env:
             # https://github.com/OpenShiftDemos/nexus/issues/6
           - name: INSTALL4J_ADD_VM_PARAMS
-            value: "-Xms1024m -Xmx1024m -Djava.util.prefs.userRoot=/nexus-data/"
+            value: "-Xms1200M -Xmx1200M -XX:MaxDirectMemorySize=2G -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/"
           - name: ORCHESTRATION_ENABLED
             value: "true"
           image: ""
@@ -152,7 +152,7 @@ objects:
               memory: 1Gi
             limits:
               cpu: 1000m
-              memory: 2Gi
+              memory: 4Gi
           volumeMounts:
           - mountPath: /nexus-data
             name: ${SERVICE_NAME}-data

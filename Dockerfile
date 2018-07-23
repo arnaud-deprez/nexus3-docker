@@ -1,4 +1,4 @@
-FROM sonatype/nexus3:3.11.0
+FROM sonatype/nexus3:3.12.1
 
 LABEL maintainer="Arnaud Deprez <arnaudeprez@gmail.com>"
 

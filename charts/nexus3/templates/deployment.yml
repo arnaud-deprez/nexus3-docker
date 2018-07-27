@@ -26,6 +26,8 @@ spec:
           imagePullPolicy: {{ .Values.nexus.imagePullPolicy }}
 {{- if .Values.nexus.env }}
           env:
+            - name: ORCHESTRATION_ENABLED
+              value: "true"
 {{ toYaml .Values.nexus.env | indent 12 }}
 {{- end }}
 {{- if .Values.nexus.resources }}
@@ -35,6 +37,12 @@ spec:
           ports:
             - containerPort: {{ .Values.service.internalPort }}
               name: nexus-http
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /docker-entrypoint.sh
+                  - init
           livenessProbe:
             httpGet:
               path: {{ .Values.nexus.livenessProbe.path }}

@@ -2,43 +2,44 @@ import groovy.json.JsonOutput
 import org.sonatype.nexus.security.role.NoSuchRoleException
 import org.sonatype.nexus.security.role.Role
 import org.sonatype.nexus.security.user.User
+import org.sonatype.nexus.security.user.UserNotFoundException
 import org.sonatype.nexus.security.user.UserStatus
 
 import static org.sonatype.nexus.security.user.UserManager.DEFAULT_SOURCE
 
 Role createOrUpdateRole(String id, String name, String description, List<String> privileges, List<String> roles) {
-    Role role = null
     try {
-        role = security.getSecuritySystem().getAuthorizationManager(DEFAULT_SOURCE).getRole(id)
-    }
-    catch (NoSuchRoleException ex) {
-        log.info("No role found with id: $id. Will create this role", ex)
-    }
-    if (role) {
+        Role role = security.getSecuritySystem().getAuthorizationManager(DEFAULT_SOURCE).getRole(id)
+        log.info("Update role $id.")
         role.setName(name)
         role.setDescription(description)
         role.setPrivileges(privileges.toSet())
         role.setRoles(roles.toSet())
-        role = security.getSecuritySystem().getAuthorizationManager(DEFAULT_SOURCE).updateRole(role)
-    } else {
-        role = security.addRole(id, name, description, privileges, roles)
+        return security.getSecuritySystem().getAuthorizationManager(DEFAULT_SOURCE).updateRole(role)
     }
-    return role
+    catch (NoSuchRoleException ex) {
+        log.info("Create role $id ($name)")
+        return security.addRole(id, name, description, privileges, roles)
+    }
+    return null
 }
 
 User createOrUpdateUser(String id, String firstName, String lastName, String email, boolean active, String password, List<String> roles) {
-    User user = security.getSecuritySystem().getUser(id)
-    if (user) {
+    try {
+        User user = security.getSecuritySystem().getUser(id)
+        log.info("Update user $id.")
         user.setFirstName(firstName)
         user.setLastName(lastName)
         user.setEmailAddress(email)
         user.setStatus(active ? UserStatus.active : UserStatus.disabled)
         security.getSecuritySystem().updateUser(user)
-        user = security.setUserRoles(id, roles)
-    } else {
-        user = security.addUser(id, firstName, lastName, email, active, password, roles)
+        return security.setUserRoles(id, roles)
     }
-    return user
+    catch (UserNotFoundException ex) {
+        log.info("Create user $id.")
+        return security.addUser(id, firstName, lastName, email, active, password, roles)
+    }
+    return null
 }
 
 //

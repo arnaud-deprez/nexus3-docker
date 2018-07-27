@@ -96,17 +96,6 @@ objects:
     strategy:
       type: Recreate
       resources: {}
-      recreateParams:
-        post:
-          failurePolicy: Abort
-          execNewPod:
-            env:
-            - name: TARGET_SERVICE_NAME
-              value: ${SERVICE_NAME}
-            command:
-            - /docker-entrypoint.sh
-            - init
-            container: nexus
     template:
       metadata:
         labels:
@@ -122,6 +111,12 @@ objects:
             value: "true"
           image: ""
           imagePullPolicy: Always
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                - /docker-entrypoint.sh
+                - init
           readinessProbe:
             failureThreshold: 3
             httpGet:

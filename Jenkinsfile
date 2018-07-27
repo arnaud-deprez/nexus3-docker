@@ -9,7 +9,7 @@ pipeline {
 
     parameters {
         string(name: 'SERVICE_NAME', defaultValue: 'nexus3', description: 'Nexus 3 openshift service name')
-        string(name: 'VERSION', defaultValue: 'latest', description: 'Version used for based sonatype/nexus3 image')
+        string(name: 'VERSION', defaultValue: '3.13.0', description: 'Version used for based sonatype/nexus3 image')
         string(name: 'VOLUME_CAPACITY', defaultValue: '10Gi', description: 'Volume capacity of the PVC for Nexus 3 storage')
     }
 

@@ -3,9 +3,9 @@ set -e
 
 function waitNexusStarted() {
     local baseUrl=$1
-    until [ $(curl -s -o /dev/null -w "%{http_code}" "$baseUrl") -eq "200" ]; do
-        echo "$0: Waiting for service started..."
-        sleep 10
+    until $(curl --output /dev/null --silent --head --fail $baseUrl); do
+        printf '.'
+        sleep 5
     done
 }
 
@@ -76,7 +76,7 @@ function usage() {
     echo "{init|run|usage}"
 }
 
-baseUrl="http://${TARGET_SERVICE_NAME:-localhost}:8081"
+baseUrl="http://localhost:8081"
 username=admin
 password=admin123
 

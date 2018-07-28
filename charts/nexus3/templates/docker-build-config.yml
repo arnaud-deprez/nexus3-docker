@@ -11,7 +11,7 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: "{{ regexSplit "/" .Values.nexus.image -1 | last }}:latest"
+      name: "{{ regexSplit "/" .Values.nexus.image -1 | last }}:{{ .Values.nexus.imageTag }}"
   postCommit: {}
   resources:
     requests:

@@ -34,8 +34,8 @@ This assume you are working in cicd project. If not, please change the project n
 oc new-project cicd
 # declare variables
 version=latest
-# create the pipeline to build and deploy nexus
-oc create -f https://raw.githubusercontent.com/arnaud-deprez/nexus3-docker/master/openshift/pipeline.yml
+# apply the pipeline to build and deploy nexus
+oc apply -f https://raw.githubusercontent.com/arnaud-deprez/nexus3-docker/master/openshift/pipeline.yml
 # start the pipeline
 oc start-build nexus3-pipeline
 ```

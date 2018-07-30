@@ -7,11 +7,12 @@ pipeline {
 
     agent { label 'gradle' }
 
+    /* This is coming from env variables from BuildConfig
     parameters {
         string(name: 'SERVICE_NAME', defaultValue: 'nexus3', description: 'Nexus 3 openshift service name')
         string(name: 'VERSION', defaultValue: '3.13.0', description: 'Version used for based sonatype/nexus3 image')
         string(name: 'VOLUME_CAPACITY', defaultValue: '10Gi', description: 'Volume capacity of the PVC for Nexus 3 storage')
-    }
+    }*/
 
     stages {
         stage('Process resources') {
@@ -24,17 +25,20 @@ pipeline {
             steps {
                 // create a build dir context
                 sh "rm -rf oc-build && mkdir -p oc-build"
-                sh "cp -R Dockerfile build docker oc-build/"
+                sh "cp -R ${params.DOCKERFILE_PATH} build docker oc-build/"
                 //create and start build
                 script {
                     openshift.withCluster() {
                         openshift.withProject('cicd') {
                             // create resources
-                            sh "helm upgrade --install ${params.SERVICE_NAME} charts/nexus3"
+                            sh "helm upgrade --install --set persistence.storageSize=${params.VOLUME_CAPACITY} --set build.dockerfilePath=${params.DOCKERFILE_PATH} ${params.SERVICE_NAME} charts/nexus3"
                             //start build
                             def buildSelector = openshift.selector('bc', "${params.SERVICE_NAME}-docker").startBuild('--from-dir=oc-build')
                             timeout(5) {
                                 buildSelector.untilEach(1) {
+                                    if (it.object().status.phase == "Failed") {
+                                        error "Build Failed: ${it.object().message}"
+                                    }
                                     return it.object().status.phase == "Complete"
                                 }
                             }

@@ -36,9 +36,9 @@ objects:
       binary: {}
     strategy:
       dockerStrategy:
-        from:
-          kind: ImageStreamTag
-          name: "nexus3:${NEXUS_VERSION}"
+        noCache: true
+        forcePull: true
+        dockerfilePath: ${DOCKERFILE_PATH}
       type: Docker
     triggers: []
 - apiVersion: v1
@@ -179,7 +179,6 @@ parameters:
   name: NEXUS_VERSION
   required: true
   value: "3.13.0"
-- description: Volume space available for Sonatype Nexus e.g. 512Mi, 2Gi
-  name: VOLUME_CAPACITY
-  required: true
-  value: 2Gi
+- displayName: Dockerfile path
+  name: DOCKERFILE_PATH
+  value: Dockerfile

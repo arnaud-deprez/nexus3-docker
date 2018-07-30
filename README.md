@@ -15,7 +15,7 @@ so your complete CI/CD pipeline infrastructure can be managed as code.
 
 ## Openshift setup
 
-This example has been tested with [Minishift](https://github.com/minishift/minishift).
+This example has been tested with [Minishift](https://github.com/minishift/minishift) and [CDK](https://developers.redhat.com/products/cdk/overview) for Rhel images.
 
 To start a new Openshift instance:
 
@@ -35,7 +35,7 @@ oc new-project cicd
 # declare variables
 version=latest
 # apply the pipeline to build and deploy nexus
-oc apply -f https://raw.githubusercontent.com/arnaud-deprez/nexus3-docker/master/openshift/pipeline.yml
+oc process -f https://raw.githubusercontent.com/arnaud-deprez/nexus3-docker/master/openshift/pipeline.yml -p DOCKERFILE_PATH=Dockerfile | oc apply -f -
 # start the pipeline
 oc start-build nexus3-pipeline
 ```

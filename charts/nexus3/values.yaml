@@ -66,4 +66,5 @@ ingress:
 build:
   git:
     uri: "https://github.com/arnaud-deprez/nexus3-docker.git"
+    ref: rhel
   contextDir: "."

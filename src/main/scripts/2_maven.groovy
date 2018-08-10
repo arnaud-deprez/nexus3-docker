@@ -77,7 +77,16 @@ createProxyRepository('jcenter', 'https://jcenter.bintray.com/')
 createProxyRepository('jboss-ga', 'https://maven.repository.redhat.com/ga/')
 createProxyRepository('gradle-plugins', 'https://plugins.gradle.org/m2/')
 createProxyRepository('spring-plugins-release', 'http://repo.spring.io/plugins-release/')
+createProxyRepository('jenkins-ci-release', 'http://repo.jenkins-ci.org/releases/')
 
-createGroupRepository('maven-public', ['maven-releases', 'maven-snapshots', 'maven-central', 'jcenter', 'jboss-ga', 'gradle-plugins', 'spring-plugins-release'])
+createGroupRepository('maven-public', [
+    'maven-releases', 
+    'maven-snapshots', 
+    'maven-central', 
+    'jcenter', 
+    'jboss-ga', 
+    'gradle-plugins', 
+    'spring-plugins-release',
+    'jenkins-ci-release'])
 
 log.info('Script 2_maven processed successfully')

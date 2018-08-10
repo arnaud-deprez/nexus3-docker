@@ -52,6 +52,8 @@ service:
 
 ingress:
   enabled: true
+  # # NOTE: to be provided by user
+  # hostname: 
   path: /
   annotations: {}
   # # NOTE: Can't use 'false' due to https://github.com/jetstack/kube-lego/issues/173.

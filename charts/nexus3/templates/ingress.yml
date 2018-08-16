@@ -1,4 +1,4 @@
-{{- if and .Values.ingress.enabled (not (eq "openshift" .Values.deployment.type)) -}}
+{{- if .Values.ingress.enabled -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -16,8 +16,7 @@ spec:
         paths:
           - backend:
               serviceName: {{ template "nexus3.fullname" . }}
-              servicePort: "nexus-port"
-            path: {{ .Values.ingress.path }}
+              servicePort: "nexus-http"
 {{- if .Values.ingress.tls.enabled }}
   tls:
     - hosts:

@@ -1,0 +1,28 @@
+apiVersion: skaffold/v1alpha2
+kind: Config
+build:
+  tagPolicy:
+    envTemplate:
+      template: "{{.DOCKER_REGISTRY}}/cicd/{{.IMAGE_NAME}}:{{.VERSION}}"
+  artifacts:
+  - imageName: "nexus3"
+    workspace: .
+    docker: {}
+  local: {}
+deploy:
+  helm:
+    releases:
+    - name: nexus3
+      chartPath: charts/nexus3
+      setValueTemplates:
+        deployment.type: "skaffold"
+        ingress.enabled: "true" 
+        nexus.image: "{{.DOCKER_REGISTRY}}/cicd/{{.IMAGE_NAME}}"
+        nexus.imageTag: "{{.VERSION}}"
+        ingress.hostname: "nexus3-cicd.{{.INGRESS_SUFFIX}}"
+profiles:
+- name: dev
+  build:
+    local: 
+      # apparently it is set to false when using minishift but true for minikube
+      skipPush: true

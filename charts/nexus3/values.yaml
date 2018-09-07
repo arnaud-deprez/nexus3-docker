@@ -51,7 +51,7 @@ service:
   internalPort: 8081
 
 ingress:
-  enabled: true
+  enabled: false
   # # NOTE: to be provided by user
   # hostname: 
   path: /

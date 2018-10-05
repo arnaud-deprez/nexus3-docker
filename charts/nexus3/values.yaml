@@ -1,11 +1,8 @@
-deployment:
-  type: "openshift"
-
 replicaCount: 1
 
 nexus:
-  image: "172.30.1.1:5000/cicd/nexus3"
-  imageTag: "3.13.0"
+  image: "arnaudeprez/nexus3"
+  imageTag: "latest"
   imagePullPolicy: IfNotPresent
   env:
     - name: INSTALL4J_ADD_VM_PARAMS
@@ -64,8 +61,3 @@ ingress:
   tls:
     enabled: false
   #   secretName: nexus-tls
-
-build:
-  git:
-    uri: "https://github.com/arnaud-deprez/nexus3-docker.git"
-  contextDir: "."

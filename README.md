@@ -1,4 +1,6 @@
-# Automate nexus configuration with scripting API
+# Nexus 3 [![Build Status](https://travis-ci.com/arnaud-deprez/nexus3-docker.svg?branch=master)](https://travis-ci.com/arnaud-deprez/nexus3-docker)
+
+This image is pre-configure nexus 3 images where the configuration is managed as code.
 
 Nexus 3 comes with a groovy script API that can be uploaded and executed on nexus through a REST API. More information
 [here](https://help.sonatype.com/display/NXRM3/REST+and+Integration+API).
@@ -32,8 +34,6 @@ This assume you are working in cicd project. If not, please change the project n
 ```sh
 # if it does not exist yet
 oc new-project cicd
-# declare variables
-version=latest
 # apply the pipeline to build and deploy nexus
 oc apply -f https://raw.githubusercontent.com/arnaud-deprez/nexus3-docker/master/openshift/pipeline.yml
 # start the pipeline

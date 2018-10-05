@@ -1,0 +1,17 @@
+sudo: required
+
+services:
+  - docker
+
+language: java
+install: true
+
+jdk:
+  - openjdk8
+
+jobs:
+  include:
+    - script: make test
+      if: branch != master
+    - script: make publish
+      if: branch = master

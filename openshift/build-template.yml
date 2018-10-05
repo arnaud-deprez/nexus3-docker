@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: nexus3-persistent
+  annotations:
+    description: Sonatype Nexus 3 persistent template
+    tags: ci,nexus
+  labels:
+    template: nexus3-build-template
+objects:
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      build: nexus3
+      app: ${SERVICE_NAME}
+    name: ${SERVICE_NAME}
+  spec:
+    failedBuildsHistoryLimit: 5
+    successfulBuildsHistoryLimit: 5
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${SERVICE_NAME}:${NEXUS_VERSION}"
+    postCommit: {}
+    resources: 
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 1000m
+        memory: 512Mi
+    runPolicy: Serial
+    source:
+      type: Docker
+      binary: {}
+    strategy:
+      type: Docker
+    triggers: []
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: ${SERVICE_NAME}
+    name: ${SERVICE_NAME}
+  spec:
+    tags:
+    - from:
+        kind: DockerImage
+        name: ${SERVICE_NAME}:${NEXUS_VERSION}
+      name: ${NEXUS_VERSION}
+parameters:
+- description: Sonatype Nexus service name
+  displayName: Sonatype Nexus service name
+  name: SERVICE_NAME
+  required: true
+  value: nexus
+- description: Sonatype Nexus version
+  displayName: Sonatype Nexus version
+  name: NEXUS_VERSION
+  required: true
+  value: "3.13.0"

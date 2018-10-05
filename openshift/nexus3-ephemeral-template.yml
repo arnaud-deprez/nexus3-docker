@@ -8,51 +8,6 @@ metadata:
   labels:
     template: nexus3-ephemeral-template
 objects:
-- apiVersion: build.openshift.io/v1
-  kind: BuildConfig
-  metadata:
-    labels:
-      build: nexus3
-      app: ${SERVICE_NAME}
-    name: ${SERVICE_NAME}-docker
-  spec:
-    failedBuildsHistoryLimit: 5
-    successfulBuildsHistoryLimit: 5
-    output:
-      to:
-        kind: ImageStreamTag
-        name: "${SERVICE_NAME}-custom:${NEXUS_VERSION}"
-    postCommit: {}
-    resources: 
-      requests:
-        cpu: 100m
-        memory: 100Mi
-      limits:
-        cpu: 1000m
-        memory: 512Mi
-    runPolicy: Serial
-    source:
-      type: Docker
-      binary: {}
-    strategy:
-      dockerStrategy:
-        from:
-          kind: ImageStreamTag
-          name: "nexus3:${NEXUS_VERSION}"
-      type: Docker
-    triggers: []
-- apiVersion: image.openshift.io/v1
-  kind: ImageStream
-  metadata:
-    labels:
-      app: ${SERVICE_NAME}
-    name: ${SERVICE_NAME}-custom
-  spec:
-    tags:
-    - from:
-        kind: DockerImage
-        name: ${SERVICE_NAME}-custom:${NEXUS_VERSION}
-      name: ${NEXUS_VERSION}
 - apiVersion: v1
   kind: Service
   metadata:

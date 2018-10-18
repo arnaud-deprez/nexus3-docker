@@ -34,8 +34,11 @@ Create chart name and version as used by the chart label.
 {{/*  Manage the labels for each entity  */}}
 {{- define "nexus3.labels" -}}
 app: {{ template "nexus3.name" . }}
-fullname: {{ template "nexus3.fullname" . }}
 chart: {{ template "nexus3.chart" . }}
 release: {{ .Release.Name }}
 heritage: {{ .Release.Service }}
+app.kubernetes.io/name: {{ include "nexus3.name" . }}
+helm.sh/chart: {{ include "nexus3.chart" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}

@@ -8,13 +8,12 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "nexus3.name" . }}
-      release: {{ .Release.Name }}
+      app.kubernetes.io/name: {{ include "nexus3.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "nexus3.name" . }}
-        release: {{ .Release.Name }}
+{{ include "nexus3.labels" . | indent 8 }}
     spec:
       {{- if .Values.nexus.nodeSelector }}
       nodeSelector:

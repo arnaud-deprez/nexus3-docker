@@ -16,5 +16,5 @@ spec:
       protocol: TCP
       name: "nexus-http"
   selector:
-    app: {{ template "nexus3.name" . }}
-    release: {{ .Release.Name }}
+    app.kubernetes.io/name: {{ include "nexus3.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

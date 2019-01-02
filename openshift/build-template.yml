@@ -59,4 +59,4 @@ parameters:
   displayName: Sonatype Nexus version
   name: NEXUS_VERSION
   required: true
-  value: "3.13.0"
+  value: "3.14.0"

@@ -16,7 +16,7 @@ repositories {
 }
 
 ext.versions = [
-    nxrm3: '3.13.0-01'
+    nxrm3: '3.14.0-04'
 ]
 
 if (!(project.hasProperty('ci') && project.property('ci') == true)) {

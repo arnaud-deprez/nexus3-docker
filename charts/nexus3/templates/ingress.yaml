@@ -4,11 +4,11 @@ kind: Ingress
 metadata:
   name: {{ template "nexus3.fullname" . }}
   labels:
-{{ include "nexus3.labels" . | indent 4 }}
+    {{ include "nexus3.labels" . | nindent 4 | trim }}
+  {{- if .Values.ingress.annotations }}  
   annotations:
-{{- if .Values.ingress.annotations }}
-{{ toYaml .Values.ingress.annotations | indent 4 }}
-{{- end }}
+    {{ toYaml .Values.ingress.annotations | nindent 4 | trim }}
+  {{- end }}
 spec:
   rules:
     - host: {{ .Values.ingress.hostname }}
@@ -17,12 +17,12 @@ spec:
           - backend:
               serviceName: {{ template "nexus3.fullname" . }}
               servicePort: "nexus-http"
-{{- if .Values.ingress.tls.enabled }}
+  {{- if .Values.ingress.tls.enabled }}
   tls:
     - hosts:
         - {{ .Values.ingress.hostname }}
       {{- if .Values.ingress.tls.secretName }}
       secretName: {{ .Values.ingress.tls.secretName | quote }}
       {{- end }}
-{{- end -}}
+  {{ end -}}
 {{- end }}

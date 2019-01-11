@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "nexus3.fullname" . }}
   labels:
-{{ include "nexus3.labels" . | indent 4 }}
+    {{ include "nexus3.labels" . | nindent 4 | trim }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -13,26 +13,26 @@ spec:
   template:
     metadata:
       labels:
-{{ include "nexus3.labels" . | indent 8 }}
+        {{ include "nexus3.labels" . | nindent 8 | trim }}
     spec:
       {{- if .Values.nexus.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.nexus.nodeSelector | indent 8 }}
+        {{ toYaml .Values.nexus.nodeSelector | nindent 8 | trim }}
       {{- end }}
       containers:
         - name: nexus
           image: {{ .Values.nexus.image }}:{{ .Values.nexus.imageTag }}
           imagePullPolicy: {{ .Values.nexus.imagePullPolicy }}
-{{- if .Values.nexus.env }}
+          {{- if .Values.nexus.env }}
           env:
             - name: ORCHESTRATION_ENABLED
               value: "true"
-{{ toYaml .Values.nexus.env | indent 12 }}
-{{- end }}
-{{- if .Values.nexus.resources }}
+            {{ toYaml .Values.nexus.env | nindent 12 | trim }}
+          {{- end }}
+          {{- if .Values.nexus.resources }}
           resources:
-{{ toYaml .Values.nexus.resources | indent 12 }}
-{{- end }}
+            {{ toYaml .Values.nexus.resources | nindent 12 | trim }}
+          {{- end }}
           ports:
             - containerPort: {{ .Values.service.internalPort }}
               name: nexus-http
@@ -61,7 +61,7 @@ spec:
               name: nexus-data
       {{- if .Values.nexus.securityContext }}
       securityContext:
-{{ toYaml .Values.nexus.securityContext | indent 8 }}
+        {{ toYaml .Values.nexus.securityContext | nindent 8 | trim }}
       {{- end }}
       volumes:
         - name: nexus-data

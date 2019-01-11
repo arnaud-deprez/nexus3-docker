@@ -2,7 +2,7 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-{{ include "nexus3.labels" . | indent 4 }}
+    {{ include "nexus3.labels" . | nindent 4 | trim }}
   name: {{ template "nexus3.name" . }}
 spec:
   failedBuildsHistoryLimit: 1
@@ -28,13 +28,13 @@ spec:
     contextDir: {{ .Values.build.contextDir | quote }}
   strategy:
     dockerStrategy:
-{{- if .Values.build.env }}
+      {{- if .Values.build.env }}
       env:
-{{- range $ekey, $eval := .Values.build.env }}
-      - name: {{ $ekey | quote }}
-        value: {{ $eval | quote }}
-{{- end }}
-{{- end }}
+        {{- range $ekey, $eval := .Values.build.env }}
+        - name: {{ $ekey | quote }}
+          value: {{ $eval | quote }}
+        {{- end }}
+      {{- end }}
       noCache: true
       forcePull: true
     type: Docker

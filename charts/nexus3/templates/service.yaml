@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: {{ template "nexus3.name" . }}
   labels:
-    {{ include "nexus3.labels" . | nindent 4 | trim }}
+    {{- include "nexus3.labels" . | nindent 4 }}
   {{- if .Values.service.annotations }}
   annotations:
-    {{ toYaml .Values.service.annotations | nindent 4 | trim }}
+    {{- toYaml .Values.service.annotations | nindent 4 }}
   {{- end }}
 spec:
   type: {{ .Values.service.type }}

@@ -4,7 +4,11 @@ services:
   - docker
 
 language: java
-install: true
+
+env:
+  - PATH="$PATH:/tmp/bin"
+
+install: "ci/install.sh"
 
 jdk:
   - openjdk8

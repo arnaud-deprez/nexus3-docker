@@ -4,10 +4,10 @@ apiVersion: v1
 metadata:
   name: {{ template "nexus3.fullname" . }}-data
   labels:
-    {{ include "nexus3.labels" . | nindent 4 | trim }}
+    {{- include "nexus3.labels" . | nindent 4 }}
   {{- if .Values.persistence.annotations }}
   annotations:
-    {{ toYaml .Values.persistence.annotations | nindent 4 | trim }}
+    {{- toYaml .Values.persistence.annotations | nindent 4 }}
   {{- end }}
 spec:
   accessModes:

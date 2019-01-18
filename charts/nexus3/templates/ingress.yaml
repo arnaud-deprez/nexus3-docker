@@ -4,10 +4,10 @@ kind: Ingress
 metadata:
   name: {{ template "nexus3.fullname" . }}
   labels:
-    {{ include "nexus3.labels" . | nindent 4 | trim }}
+    {{- include "nexus3.labels" . | nindent 4 }}
   {{- if .Values.ingress.annotations }}  
   annotations:
-    {{ toYaml .Values.ingress.annotations | nindent 4 | trim }}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
   {{- end }}
 spec:
   rules:

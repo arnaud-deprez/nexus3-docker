@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "nexus3.fullname" . }}
   labels:
-    {{ include "nexus3.labels" . | nindent 4 | trim }}
+    {{- include "nexus3.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -13,11 +13,11 @@ spec:
   template:
     metadata:
       labels:
-        {{ include "nexus3.labels" . | nindent 8 | trim }}
+        {{- include "nexus3.labels" . | nindent 8 }}
     spec:
       {{- if .Values.nexus.nodeSelector }}
       nodeSelector:
-        {{ toYaml .Values.nexus.nodeSelector | nindent 8 | trim }}
+        {{- toYaml .Values.nexus.nodeSelector | nindent 8 }}
       {{- end }}
       containers:
         - name: nexus
@@ -27,11 +27,11 @@ spec:
           env:
             - name: ORCHESTRATION_ENABLED
               value: "true"
-            {{ toYaml .Values.nexus.env | nindent 12 | trim }}
+            {{- toYaml .Values.nexus.env | nindent 12 }}
           {{- end }}
           {{- if .Values.nexus.resources }}
           resources:
-            {{ toYaml .Values.nexus.resources | nindent 12 | trim }}
+            {{- toYaml .Values.nexus.resources | nindent 12 }}
           {{- end }}
           ports:
             - containerPort: {{ .Values.service.internalPort }}
@@ -61,7 +61,7 @@ spec:
               name: nexus-data
       {{- if .Values.nexus.securityContext }}
       securityContext:
-        {{ toYaml .Values.nexus.securityContext | nindent 8 | trim }}
+        {{- toYaml .Values.nexus.securityContext | nindent 8 }}
       {{- end }}
       volumes:
         - name: nexus-data

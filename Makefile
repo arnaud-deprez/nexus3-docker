@@ -1,7 +1,13 @@
 IMAGE_NAME = arnaudeprez/nexus3:latest
 
+buildCharts:
+	for chart in charts/*; do \
+		helm dependency build $$chart; \
+		helm lint $$chart; \
+	done
+
 .PHONY: build
-build:
+build: buildCharts
 	gradle transformScriptToJson
 	docker build -t $(IMAGE_NAME) .
 

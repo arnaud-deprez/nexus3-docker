@@ -2,7 +2,7 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    {{ include "nexus3.labels" . | nindent 4 | trim }}
+    {{- include "nexus3.labels" . | nindent 4 }}
   name: {{ template "nexus3.name" . }}
 spec:
   failedBuildsHistoryLimit: 1

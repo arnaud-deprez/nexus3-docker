@@ -1,6 +1,6 @@
 nexus:
   image: "172.30.1.1:5000/cicd/nexus3"
-  imageTag: "3.13.0"
+  imageTag: "3.16.1"
 build:
   git:
     uri: "https://github.com/arnaud-deprez/nexus3-docker.git"

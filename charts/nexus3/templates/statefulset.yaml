@@ -1,11 +1,12 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ template "nexus3.fullname" . }}
   labels:
     {{- include "nexus3.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  serviceName: {{ template "nexus3.name" . }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "nexus3.name" . }}
@@ -58,16 +59,37 @@ spec:
             failureThreshold: {{ .Values.nexus.readinessProbe.failureThreshold }}
           volumeMounts:
             - mountPath: /nexus-data
-              name: nexus-data
+              name: data
       {{- if .Values.nexus.securityContext }}
       securityContext:
         {{- toYaml .Values.nexus.securityContext | nindent 8 }}
       {{- end }}
+      {{- if not .Values.persistence.enabled }}
       volumes:
-        - name: nexus-data
-          {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-%s" (include "nexus3.fullname" .) "data") }}
-          {{- else }}
+        - name: data
           emptyDir: {}
-          {{- end -}}
+      {{- end }}
+  volumeClaimTemplates: 
+    {{- if .Values.persistence.enabled }}
+    - metadata:
+        name: data
+        labels:
+          {{- include "nexus3.labels" . | nindent 10 }}
+        {{- if .Values.persistence.annotations }}
+        annotations:
+          {{- toYaml .Values.persistence.annotations | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+          - {{ .Values.persistence.accessMode | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.storageSize | quote }}
+        {{- if .Values.persistence.storageClass }}
+        {{- if (eq "-" .Values.persistence.storageClass) }}
+        storageClassName: ""
+        {{- else }}
+        storageClassName: "{{ .Values.persistence.storageClass }}"
+        {{- end }}
+        {{- end }}
+    {{- end }}

@@ -33,10 +33,12 @@ function createOrUpdateThenRunScript() {
 function init() {
     local baseUrl=$1
     local username=$2
-    local password=$3
 
-    #wait
+    # wait
     waitNexusStarted $baseUrl
+
+    # retrieve admin password
+    local password=$(cat "${NEXUS_DATA}/admin.password")
 
     echo "$0: Start Nexus initialization..."
 
@@ -78,10 +80,9 @@ function usage() {
 
 baseUrl="http://localhost:8081"
 username=admin
-password=admin123
 
 case "$1" in
-    init) init "$baseUrl" "$username" "$password" ;;
+    init) init "$baseUrl" "$username" ;;
     usage) usage ;;
     *) run "$@" ;;
 esac

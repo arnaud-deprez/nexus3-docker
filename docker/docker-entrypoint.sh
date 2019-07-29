@@ -61,7 +61,7 @@ function run() {
         pid="$!"
 
         # run actual init
-        init "$baseUrl" "$username" "$password"
+        init "$baseUrl" "$username"
 
         #stop nexus
         if ! kill -s TERM "$pid" || ! wait "$pid"; then
